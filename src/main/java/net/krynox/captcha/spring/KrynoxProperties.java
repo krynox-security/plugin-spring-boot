@@ -1,4 +1,4 @@
-package id.krynox.captcha.spring;
+package net.krynox.captcha.spring;
 
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;

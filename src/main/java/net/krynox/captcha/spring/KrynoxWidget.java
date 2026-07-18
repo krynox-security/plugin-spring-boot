@@ -1,11 +1,11 @@
-package id.krynox.captcha.spring;
+package net.krynox.captcha.spring;
 
 /**
  * Server-rendered widget embed helper — returns an HTML string you can drop into a Thymeleaf/JSP
  * template or a controller response. In Thymeleaf:
  *
  * <pre>{@code
- * <div th:utext="${T(id.krynox.captcha.spring.KrynoxWidget).tag('kcpt_your_site_key')}"></div>
+ * <div th:utext="${T(net.krynox.captcha.spring.KrynoxWidget).tag('kcpt_your_site_key')}"></div>
  * }</pre>
  */
 public final class KrynoxWidget {
