@@ -37,6 +37,9 @@ public class KrynoxProperties {
   /** Request parameter (form field) carrying the solved token. */
   private String field = "krynox-captcha";
 
+  /** Request parameter carrying the honeypot decoy value (injected by the widget as {@code krynox-hp}). */
+  private String honeypotField = "krynox-hp";
+
   /** Header checked when the parameter is absent — for fetch/API clients. */
   private String header = "X-Krynox-Captcha";
 
@@ -92,6 +95,14 @@ public class KrynoxProperties {
 
   public void setField(String field) {
     this.field = field;
+  }
+
+  public String getHoneypotField() {
+    return honeypotField;
+  }
+
+  public void setHoneypotField(String honeypotField) {
+    this.honeypotField = honeypotField;
   }
 
   public String getHeader() {

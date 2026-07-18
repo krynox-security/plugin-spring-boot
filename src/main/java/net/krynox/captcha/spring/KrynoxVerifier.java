@@ -30,6 +30,15 @@ public class KrynoxVerifier {
 
   /** Verify {@code token}; {@code remoteip} is optional (may be null). */
   public KrynoxResult verify(String token, String remoteip) {
+    return verify(token, remoteip, null);
+  }
+
+  /**
+   * Verify {@code token}; {@code remoteip} and {@code honeypot} are optional (may be null).
+   * {@code honeypot} is the submitted {@code krynox-hp} decoy field — forwarded so the data plane
+   * can flag/block a filled-in decoy per the site's Honeypot policy.
+   */
+  public KrynoxResult verify(String token, String remoteip, String honeypot) {
     if (token == null || token.isEmpty()) {
       return KrynoxResult.failed("missing-input-response");
     }
@@ -37,6 +46,7 @@ public class KrynoxVerifier {
     body.put("secret", props.getSecret());
     body.put("response", token);
     if (remoteip != null) body.put("remoteip", remoteip);
+    if (honeypot != null) body.put("honeypot", honeypot);
     if (props.getRetries() > 0) body.put("idempotency_key", UUID.randomUUID().toString());
 
     JsonNode data = post(props.getApiHost().replaceAll("/+$", "") + "/siteverify", body);
