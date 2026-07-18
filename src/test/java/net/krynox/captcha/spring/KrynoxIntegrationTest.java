@@ -1,4 +1,4 @@
-package id.krynox.captcha.spring;
+package net.krynox.captcha.spring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

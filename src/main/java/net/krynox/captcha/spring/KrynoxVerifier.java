@@ -1,4 +1,4 @@
-package id.krynox.captcha.spring;
+package net.krynox.captcha.spring;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

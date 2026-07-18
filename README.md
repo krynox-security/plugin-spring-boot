@@ -5,7 +5,7 @@ verify filter plus a widget embed helper. Privacy-first, proof-of-work CAPTCHA. 
 
 ```xml
 <dependency>
-  <groupId>id.krynox</groupId>
+  <groupId>net.krynox</groupId>
   <artifactId>krynox-captcha-spring-boot-starter</artifactId>
   <version>0.1.0</version>
 </dependency>
@@ -53,7 +53,7 @@ String signup(@RequestAttribute("krynox") KrynoxResult k) {
 
 ```html
 <form method="post" action="/signup">
-  <div th:utext="${T(id.krynox.captcha.spring.KrynoxWidget).tag('kcpt_your_site_key')}"></div>
+  <div th:utext="${T(net.krynox.captcha.spring.KrynoxWidget).tag('kcpt_your_site_key')}"></div>
   <button type="submit">Sign up</button>
 </form>
 ```

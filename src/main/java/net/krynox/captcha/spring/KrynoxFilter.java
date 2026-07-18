@@ -1,4 +1,4 @@
-package id.krynox.captcha.spring;
+package net.krynox.captcha.spring;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
