@@ -20,6 +20,20 @@
     </license>
   </licenses>
 
+  <developers>
+    <developer>
+      <name>Krynox</name>
+      <organization>Krynox</organization>
+      <organizationUrl>https://krynox.net</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/krynox-security/plugin-spring-boot</url>
+    <connection>scm:git:https://github.com/krynox-security/plugin-spring-boot.git</connection>
+    <developerConnection>scm:git:git@github.com:krynox-security/plugin-spring-boot.git</developerConnection>
+  </scm>
+
   <properties>
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -84,4 +98,44 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- `mvn -Prelease deploy` attaches sources + javadoc, GPG-signs, and publishes to Maven Central
+       via the Sonatype Central Portal. Isolated in a profile so ordinary builds/tests need no GPG. -->
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions><execution><id>attach-sources</id><goals><goal>jar-no-fork</goal></goals></execution></executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.11.2</version>
+            <executions><execution><id>attach-javadoc</id><goals><goal>jar</goal></goals></execution></executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.7</version>
+            <executions><execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution></executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.7.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>true</autoPublish>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

@@ -1,0 +1,32 @@
+name: Release
+
+# Publishes to Maven Central (Sonatype Central Portal) on a version tag. Dormant until tagged.
+# Requires secrets: MAVEN_CENTRAL_USERNAME, MAVEN_CENTRAL_PASSWORD (Central Portal user token),
+# MAVEN_GPG_PRIVATE_KEY (ASCII-armored), MAVEN_GPG_PASSPHRASE. The id.krynox namespace must be
+# verified once on the Central Portal before the first publish.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish-maven:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - run: mvn --batch-mode -Prelease deploy
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
