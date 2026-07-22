@@ -47,7 +47,8 @@ public class KrynoxFilter extends OncePerRequestFilter {
       token = request.getHeader(props.getHeader());
     }
 
-    KrynoxResult result = verifier.verify(token, clientIp(request));
+    KrynoxResult result =
+        verifier.verify(token, clientIp(request), request.getParameter(props.getHoneypotField()));
     request.setAttribute(ATTRIBUTE, result);
 
     if (!result.success()) {

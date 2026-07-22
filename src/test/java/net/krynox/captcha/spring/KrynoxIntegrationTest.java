@@ -45,6 +45,7 @@ class KrynoxIntegrationTest {
   private static HttpServer mock;
   private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final ConcurrentHashMap<String, Integer> RETRIES = new ConcurrentHashMap<>();
+  static volatile String lastHoneypot = "__unset__";
 
   @BeforeAll
   static void startMock() throws IOException {
@@ -54,6 +55,7 @@ class KrynoxIntegrationTest {
       JsonNode body = MAPPER.readTree(in.length == 0 ? "{}" : new String(in, StandardCharsets.UTF_8));
       String token = body.path("response").asText("");
       String key = body.path("idempotency_key").asText("nokey");
+      lastHoneypot = body.has("honeypot") ? body.path("honeypot").asText("") : "__absent__";
 
       String json;
       int status = 200;
@@ -62,6 +64,8 @@ class KrynoxIntegrationTest {
         json = "upstream";
       } else if (token.isEmpty() || "BAD".equals(token)) {
         json = "{\"success\":false,\"error-codes\":[\"invalid-input-response\"],\"reasons\":[]}";
+      } else if (!"__absent__".equals(lastHoneypot) && !lastHoneypot.isEmpty()) {
+        json = "{\"success\":false,\"error-codes\":[\"honeypot-tripped\"],\"reasons\":[\"honeypot-tripped\"]}";
       } else {
         json =
             "{\"success\":true,\"score\":0.95,\"risk\":\"low\",\"hostname\":\"example.com\","
@@ -97,10 +101,15 @@ class KrynoxIntegrationTest {
   }
 
   private ResponseEntity<String> postForm(String path, String token) {
+    return postForm(path, token, null);
+  }
+
+  private ResponseEntity<String> postForm(String path, String token, String honeypot) {
     HttpHeaders h = new HttpHeaders();
     h.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
     MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
     if (token != null) form.add("krynox-captcha", token);
+    if (honeypot != null) form.add("krynox-hp", honeypot);
     return rest.postForEntity(url(path), new HttpEntity<>(form, h), String.class);
   }
 
@@ -145,6 +154,26 @@ class KrynoxIntegrationTest {
   @Test
   void retryRecovers() {
     assertThat(postForm("/submit", "RETRY").getStatusCode().value()).isEqualTo(200);
+  }
+
+  @Test
+  void cleanSubmitDoesNotTripHoneypot() {
+    lastHoneypot = "__unset__";
+    ResponseEntity<String> res = postForm("/submit", "goodtoken");
+    assertThat(res.getStatusCode().value()).isEqualTo(200);
+    // An empty/absent decoy is never penalised.
+    assertThat(lastHoneypot).isIn("__absent__", "");
+  }
+
+  @Test
+  void filledHoneypotIsForwardedAndRejected() {
+    lastHoneypot = "__unset__";
+    ResponseEntity<String> res = postForm("/submit", "goodtoken", "bot@spam.com");
+    // The krynox-hp field reached /siteverify as `honeypot` …
+    assertThat(lastHoneypot).isEqualTo("bot@spam.com");
+    // … and the enforce-mode data plane rejected it.
+    assertThat(res.getStatusCode().value()).isEqualTo(403);
+    assertThat(res.getBody()).contains("captcha_failed");
   }
 
   @SpringBootApplication
