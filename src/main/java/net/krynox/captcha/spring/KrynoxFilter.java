@@ -60,11 +60,16 @@ public class KrynoxFilter extends OncePerRequestFilter {
     chain.doFilter(request, response);
   }
 
-  private static String clientIp(HttpServletRequest request) {
-    String fwd = request.getHeader("X-Forwarded-For");
-    if (fwd != null && !fwd.isBlank()) {
-      return fwd.split(",")[0].trim();
+  private String clientIp(HttpServletRequest request) {
+    String trustedHeader = props.getTrustedProxyHeader();
+    if (trustedHeader != null && !trustedHeader.isBlank()) {
+      String forwarded = request.getHeader(trustedHeader);
+      if (forwarded != null && !forwarded.isBlank()) {
+        return forwarded.split(",")[0].trim();
+      }
     }
+    // Safe default: the servlet container's resolved peer. Configure Tomcat's
+    // RemoteIpValve/forward-headers strategy, or explicitly opt into a header above.
     return request.getRemoteAddr();
   }
 

@@ -49,6 +49,12 @@ public class KrynoxProperties {
   /** Transient-failure (network / 429 / 5xx) retries. */
   private int retries = 2;
 
+  /**
+   * Optional forwarding header set and overwritten by a trusted edge. Null by
+   * default: arbitrary X-Forwarded-For input is never trusted implicitly.
+   */
+  private String trustedProxyHeader;
+
   public boolean isEnabled() {
     return enabled;
   }
@@ -111,6 +117,14 @@ public class KrynoxProperties {
 
   public void setHeader(String header) {
     this.header = header;
+  }
+
+  public String getTrustedProxyHeader() {
+    return trustedProxyHeader;
+  }
+
+  public void setTrustedProxyHeader(String trustedProxyHeader) {
+    this.trustedProxyHeader = trustedProxyHeader;
   }
 
   public long getTimeoutMs() {

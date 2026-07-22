@@ -70,6 +70,7 @@ String signup(@RequestAttribute("krynox") KrynoxResult k) {
 | `krynox.header` | `X-Krynox-Captcha` | Header checked when the parameter is absent. |
 | `krynox.timeout-ms` | `5000` | Per-attempt request timeout. |
 | `krynox.retries` | `2` | Transient-failure (network/429/5xx) retries; a retried single-use token replays the first outcome via an idempotency key. |
+| `krynox.trusted-proxy-header` | — | Optional edge-overwritten client-IP header. Disabled by default; prefer Spring Boot/Tomcat trusted-proxy configuration so `getRemoteAddr()` is resolved safely. |
 | `krynox.enabled` | `true` | Master switch. |
 
 Need custom logic (e.g. verify inside a service)? Inject the auto-configured `KrynoxVerifier` bean
